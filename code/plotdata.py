@@ -1,3 +1,4 @@
+"""Plot some random heartbeats from a chosen dataset."""
 import sys
 
 import pandas as pd
@@ -14,11 +15,13 @@ def plot_processed_data(df, title, xlabel, ylabel, process):
     for idx in range(num):
         axes[idx].title.set_text("Sample number " + str(df.index[idx]))
         axes[idx].set_ylabel(ylabel)
-        axes[idx].plot(process(df.iloc[idx]), label="Class: " + str(int(df.iloc[idx, -1])))
+        axes[idx].plot(
+            process(df.iloc[idx]), label="Class: " + str(int(df.iloc[idx, -1]))
+        )
         axes[idx].legend()
     # Shared xlabel
     fig.add_subplot(111, frameon=False)
-    plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+    plt.tick_params(labelcolor="none", top=False, bottom=False, left=False, right=False)
     plt.xlabel(xlabel)
     return fig
 
@@ -47,6 +50,7 @@ def plot_ecg(filename, num):
     )
 
     plt.show()
+
 
 def main():
     """Usage:
