@@ -32,13 +32,18 @@ Feel free to add/update your environment to the repo in a similar file, with
 ```sh
 $ conda env export > environment-[OS].yml
 ```
-where `[OS]` should be `mac`, `ubuntu`, etc.
+where `[OS]` should be `mac`, `ubuntu`, etc. Make sure the saved encoding is `utf-8`.
 
-The [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) has more information about manging environments. If you'd like to add packages to the environment, don't forget to update the `environment-[OS].yml` file with
+To update your local environment with a new .yml file, run
 ```sh
 $ conda env update -f environment-[OS].yml
 ```
-where `[OS]` is your OS.
+
+The [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) has more information about manging environments. If you'd like to add packages to the environment file, update the `environment-[OS].yml` file with
+```sh
+$ conda env export > environment-[OS].yml
+```
+Make sure the encoding is `utf-8`, and push the result.
 
 ### TensorFlow
 To test that the TensorFlow 2.0 beta is up and running, start the `conda` environment (if you haven't already) and run `python`:
