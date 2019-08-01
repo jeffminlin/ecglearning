@@ -10,7 +10,7 @@ def plot_processed_data(df, title, xlabel, ylabel, process):
     """Make a figure with subplots after processing the data."""
 
     num = len(df.index)
-    fig, axes = plt.subplots(num, 1, sharex=True)
+    fig, axes = plt.subplots(num, 1, sharex=True, figsize=(8,8))
     fig.suptitle(title)
     for idx in range(num):
         axes[idx].title.set_text("Sample number " + str(df.index[idx]))
@@ -30,9 +30,9 @@ def plot_ecg(filename, num):
     """Assumes that the last column is the class."""
 
     df = pd.read_csv(filename, header=None)
-    df.rename(columns={df.columns[-1]: "Classes"}, inplace=True)
-    print("Count of each class")
-    print(df.groupby("Classes").size())
+    # df.rename(columns={df.columns[-1]: "Classes"}, inplace=True)
+    # print("Count of each class")
+    # print(df.groupby("Classes").size())
     data = df.sample(n=num, axis=0)
     fig = plot_processed_data(
         data,
@@ -50,18 +50,3 @@ def plot_ecg(filename, num):
     )
 
     plt.show()
-
-
-def main():
-    """Usage:
-    python path-to-this-file path-to-data number-of-samples
-    e.g. from the main project folder, you might run
-        python ./code/plotdata.py ./data/mitbih_train.csv 3
-    """
-
-    plot_ecg(sys.argv[1], int(sys.argv[2]))
-
-
-if __name__ == "__main__":
-
-    main()

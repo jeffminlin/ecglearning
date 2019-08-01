@@ -4,7 +4,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
-import models
+from . import models as mod
 
 
 def preprocess(trainfile, testfile, fft=False):
@@ -40,10 +40,11 @@ def preprocess(trainfile, testfile, fft=False):
 def class_count(datasets):
 
     for key in datasets:
+        print()
         print(key.capitalize() + " set")
         print("Count of each class")
         print(datasets[key].groupby("Classes").size())
-        print()
+
 
 def dataset_fft(dataset_arrays):
 
@@ -58,9 +59,11 @@ def train_dense(datasets, labels, hiddenlayers, config):
 
     inputsize = datasets["train"].shape[1]
     ncategories = labels["train"].shape[1]
-    model = models.create_dense(inputsize, hiddenlayers, ncategories)
+    model = mod.create_dense(inputsize, hiddenlayers, ncategories)
     model.summary()
 
+    print()
+    print("Training")
     model.compile(
         optimizer="Nadam",
         loss="categorical_crossentropy",
@@ -73,44 +76,6 @@ def train_dense(datasets, labels, hiddenlayers, config):
         epochs=config["epochs"],
         validation_split=config["val_split"],
     )
+    print()
+    print("Testing")
     model.evaluate(datasets["test"], labels["test"])
-
-
-def main():
-
-    # Read in data
-    files = (sys.argv[1], sys.argv[2])
-    inputs, labels, df = preprocess(*files, fft=True)
-    class_count(df)
-
-    # Try least-squares
-    print("Trying least-squares")
-    lstsq_soln = np.linalg.lstsq(inputs["train"], labels["train"], rcond=None)
-    print("Rank of training dataset:", lstsq_soln[2])
-    print()
-
-    print("Checking predictions")
-    coeffs = lstsq_soln[0]
-    predict = {}
-    accuracy = {}
-    for key in inputs:
-        predict[key] = np.argmax(np.dot(inputs[key], coeffs), axis=1)
-        num_correct = np.sum(
-            labels[key][range(labels[key].shape[0]), predict[key]] == 1
-        )
-        accuracy[key] = num_correct / labels[key].shape[0]
-    print("Training accuracy:", accuracy["train"])
-    print("Test accuracy:", accuracy["test"])
-    print()
-
-    # Try a bland dense network
-    # Would probably be better to avoid overfitting in some way
-    print("Trying a bland dense network")
-    config = {"batch_size": 30, "val_split": 0.2, "epochs": 20}
-    hiddenlayers = [(10, "relu"), (10, "relu")]
-    train_dense(inputs, labels, hiddenlayers, config)
-
-
-if __name__ == "__main__":
-
-    main()
