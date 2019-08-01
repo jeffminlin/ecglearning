@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 
+from tensorflow.keras import callbacks
+
 from . import models as mod
 
 
@@ -66,6 +68,9 @@ def train_dense(datasets, labels, hiddenlayers, config):
 
     print()
     print("Training")
+    earlystop = callbacks.EarlyStopping(
+        monitor="val_loss", patience=3, restore_best_weights=True
+    )
     model.compile(
         optimizer="Nadam",
         loss="categorical_crossentropy",
@@ -76,6 +81,7 @@ def train_dense(datasets, labels, hiddenlayers, config):
         labels["train"],
         batch_size=config["batch_size"],
         epochs=config["epochs"],
+        callbacks=[earlystop],
         validation_split=config["val_split"],
     )
     print()
