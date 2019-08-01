@@ -31,7 +31,7 @@ def plot_ecg(filename, num):
 
     df = pd.read_csv(filename, header=None)
     df.rename(columns={df.columns[-1]: "Classes"}, inplace=True)
-    print("Frequency of each class")
+    print("Count of each class")
     print(df.groupby("Classes").size())
     data = df.sample(n=num, axis=0)
     fig = plot_processed_data(
