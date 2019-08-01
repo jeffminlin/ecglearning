@@ -16,6 +16,8 @@ def preprocess(trainfile, testfile, fft=False):
     for key, name in filenames.items():
         # Read in dataset
         datasets[key] = pd.read_csv(name, header=None)
+        # Shuffle in-place
+        datasets[key] = datasets[key].sample(frac=1)
         datasets[key].rename(
             columns={datasets[key].columns[-1]: "Classes"}, inplace=True
         )
