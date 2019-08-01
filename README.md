@@ -2,6 +2,9 @@
 Detection of cardiac arrhythmia using deep learning techniques.
 
 ## Getting started
+### Data
+You can find the data at [Kaggle](https://www.kaggle.com/shayanfazeli/heartbeat).
+
 ### Conda environment
 If you're running Windows, you can install the dependencies in the `environment-win.yml` file by running
 ```sh
