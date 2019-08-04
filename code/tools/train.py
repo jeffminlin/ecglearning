@@ -9,8 +9,6 @@ from tensorflow.keras import callbacks
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
 
-from . import models as mod
-
 
 def preprocess(trainfile, testfile, fft=False):
 
@@ -64,11 +62,8 @@ def dataset_fft(dataset_arrays):
     return datasets_fft
 
 
-def train_dense(dataset_arrays, labels, hiddenlayers, config):
+def train_print(model, dataset_arrays, labels, config):
 
-    inputsize = dataset_arrays["train"].shape[1]
-    ncategories = labels["train"].shape[1]
-    model = mod.create_dense(inputsize, hiddenlayers, ncategories)
     model.summary()
 
     print()
@@ -103,7 +98,7 @@ def train_dense(dataset_arrays, labels, hiddenlayers, config):
         model.evaluate(dataset_arrays["test"], labels["test"], verbose=0)[1],
     )
 
-    return history, model
+    return history
 
 
 def plot_fit_history(history):
