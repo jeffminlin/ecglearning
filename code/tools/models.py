@@ -81,3 +81,57 @@ def create_conv1d(inputsize, layerlist, ncategories):
 
     return tf.keras.Model(inputs=inputs, outputs=outputs, name="conv1d")
 
+
+# WaveNet components
+def filter_gate_multiply(nfilters, dilation_rate, output):
+
+    filter_out = layers.Conv1D(
+        filters=nfilters,
+        kernel_size=2,
+        padding="causal",
+        dilation_rate=dilation_rate,
+        activation="tanh",
+        kernel_initializer="glorot_normal",
+    )(output)
+    gate = layers.Conv1D(
+        filters=nfilters,
+        kernel_size=2,
+        padding="causal",
+        dilation_rate=dilation_rate,
+        activation="sigmoid",
+        kernel_initializer="glorot_normal",
+    )(output)
+
+    return layers.Multiply()([filter_out, gate])
+
+
+def residual_block(nfilters, dilation_rate):
+
+    return [
+        ("startskip",),
+        (lambda output: filter_gate_multiply(nfilters, dilation_rate, output),),
+        (
+            "conv",
+            {
+                "filters": nfilters,
+                "width": 1,
+                "padding": "causal",
+                "dilation": 1,
+                "activation": "linear",
+            },
+        ),
+        ("startskip",),
+        ("endskip", -2),
+    ]
+
+
+def add_res_blocks(nblocks, nfilters, dilation_limit, layerlist):
+
+    dilation_rate = 1
+    for block_idx in range(nblocks):
+        if dilation_rate > dilation_limit:
+            dilation_rate = 1
+        layerlist.extend(residual_block(nfilters, dilation_rate))
+        dilation_rate *= 2
+    for skip_idx in range(nblocks):
+        layerlist.append(("endskip",))
