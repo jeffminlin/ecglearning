@@ -6,8 +6,6 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from tensorflow.keras import callbacks
-from sklearn.metrics import confusion_matrix
-from sklearn.utils.multiclass import unique_labels
 
 
 def preprocess(trainfile, testfile, fft=False):
@@ -90,10 +88,10 @@ def train(model, dataset_arrays, labels, config):
         restore_best_weights=True,
         min_delta=1.0e-4,
     )
-    callbacks = [earlystop]
+    callback_list = [earlystop]
     if config.get("logdir"):
         tensorboard_callback = callbacks.TensorBoard(log_dir=config["logdir"])
-        callbacks.append(tensorboard_callback)
+        callback_list.append(tensorboard_callback)
     model.compile(
         optimizer=config["optimizer"],
         loss=config["loss"],
@@ -105,7 +103,7 @@ def train(model, dataset_arrays, labels, config):
         verbose=config["verbose"],
         batch_size=config["batch_size"],
         epochs=config["epochs"],
-        callbacks=[earlystop, tensorboard_callback],
+        callbacks=callback_list,
         validation_split=config["val_split"],
     )
 

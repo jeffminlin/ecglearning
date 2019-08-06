@@ -5,6 +5,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
+
 
 def plot_processed_data(df, title, xlabel, ylabel, process, num):
     """Make a figure with subplots after processing the data."""
@@ -85,14 +88,15 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
             title = "Confusion matrix, without normalization"
 
     # Compute confusion matrix
-    cm = confusion_matrix(y_true, y_pred, labels=classes)
+    cm = confusion_matrix(y_true, y_pred)
+    classes = classes[unique_labels(y_true, y_pred).astype(int)]
     if normalize:
+        print("Confusion matrix, without normalization")
+        print(cm)
         cm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
     #     print("Normalized confusion matrix")
     # else:
-    #     print("Confusion matrix, without normalization")
 
-    # print(cm)
 
     fig, ax = plt.subplots()
     im = ax.imshow(cm, interpolation="nearest", cmap=cmap)
