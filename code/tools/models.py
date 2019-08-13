@@ -62,7 +62,7 @@ def create_conv1d(inputsize, layerlist, ncategories):
                 kernel_initializer="glorot_normal",
             )(outputs)
         elif layer[0] == "maxpool":
-            outputs = layers.MaxPooling1D(pool_size=layer[1])(outputs)
+            outputs = layers.MaxPooling1D(pool_size=layer[1], strides=2)(outputs)
         elif layer[0] == "fc":
             outputs = layers.Dense(layer[1], activation=layer[2])(outputs)
         elif layer[0] == "startskip":

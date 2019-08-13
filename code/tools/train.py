@@ -6,6 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 
 from tensorflow.keras import callbacks
+from keras_tqdm import TQDMNotebookCallback
 
 
 def preprocess(trainfile, testfile, fft=False):
@@ -89,6 +90,15 @@ def train(model, dataset_arrays, labels, config):
         min_delta=1.0e-4,
     )
     callback_list = [earlystop]
+    if config.get("progbar"):
+        tqdmcb = TQDMNotebookCallback()
+        tqdmcb.on_train_batch_begin = tqdmcb.on_batch_begin
+        tqdmcb.on_train_batch_end = tqdmcb.on_batch_end
+        tqdmcb.on_test_batch_begin = tqdmcb.on_batch_begin
+        tqdmcb.on_test_batch_end = tqdmcb.on_batch_end
+        setattr(tqdmcb, "on_test_begin", lambda x: None)
+        setattr(tqdmcb, "on_test_end", lambda x: None)
+        callback_list.append(tqdmcb)
     if config.get("logdir"):
         tensorboard_callback = callbacks.TensorBoard(log_dir=config["logdir"])
         callback_list.append(tensorboard_callback)
@@ -100,6 +110,7 @@ def train(model, dataset_arrays, labels, config):
     history = model.fit(
         dataset_arrays["train"],
         labels["train"],
+        class_weight=config.get("class_weights"),
         verbose=config["verbose"],
         batch_size=config["batch_size"],
         epochs=config["epochs"],

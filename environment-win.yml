@@ -120,6 +120,7 @@ dependencies:
     - jupyter==1.0.0
     - jupyter-console==6.0.0
     - keras==2.2.4
+    - keras-tqdm==2.0.1
     - networkx==2.3
     - pip==19.2.1
     - pymongo==3.8.0
