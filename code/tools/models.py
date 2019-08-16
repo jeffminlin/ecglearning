@@ -137,3 +137,16 @@ def add_res_blocks(nblocks, nfilters, dilation_limit, layerlist):
         dilation_rate *= 2
     for skip_idx in range(nblocks):
         layerlist.append(("endskip",))
+
+
+def create_lstm(LSTM_list, ncategories, config):
+
+    inputs = tf.keras.Input(shape=(None, 1))
+    outputs = inputs
+    for layer in LSTM_list:
+        outputs = layers.LSTM(layer[0])(outputs)
+    outputs = layers.Dense(
+        ncategories, activation="softmax", kernel_regularizer=config.get("regularizer")
+    )(outputs)
+
+    return tf.keras.Model(inputs=inputs, outputs=outputs, name="lstm")
