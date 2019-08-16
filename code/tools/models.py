@@ -19,7 +19,7 @@ def create_dense(inputsize, hiddenlayers, ncategories):
     return tf.keras.Model(inputs=inputs, outputs=outputs, name="dense_model")
 
 
-def create_conv1d(inputsize, layerlist, ncategories):
+def create_conv1d(inputsize, layerlist, ncategories, config):
     """Make a CNN with convolutional layers, max pooling, and fully connected layers.
 
     The convolutional layers will have 'glorot_normal' initialization. To add one,
@@ -77,7 +77,9 @@ def create_conv1d(inputsize, layerlist, ncategories):
         else:
             outputs = layer[0](outputs)
     outputs = layers.Flatten()(outputs)
-    outputs = layers.Dense(ncategories, activation="softmax")(outputs)
+    outputs = layers.Dense(
+        ncategories, activation="softmax", kernel_regularizer=config.get("regularizer")
+    )(outputs)
 
     return tf.keras.Model(inputs=inputs, outputs=outputs, name="conv1d")
 

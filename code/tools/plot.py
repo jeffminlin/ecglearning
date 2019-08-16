@@ -5,15 +5,20 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, roc_curve, precision_recall_curve, auc
 from sklearn.utils.multiclass import unique_labels
+from sklearn.preprocessing import label_binarize
+from sklearn.multiclass import OneVsRestClassifier
+
+from scipy import interp
+from itertools import cycle
 
 
 def plot_processed_data(df, title, xlabel, ylabel, process, num):
     """Make a figure with subplots after processing the data."""
 
     num = len(df.index)
-    fig, axes = plt.subplots(num, 1, sharex=True, figsize=(8, 2.5*num))
+    fig, axes = plt.subplots(num, 1, sharex=True, figsize=(8, 2.5 * num))
     fig.suptitle(title)
     for idx in range(num):
         axes[idx].title.set_text("Sample number " + str(df.index[idx]))
@@ -47,7 +52,7 @@ def plot_ecg(filename, samplerate, num):
             np.arange(len(np.trim_zeros(row[:-1]))) / samplerate,
             np.trim_zeros(row[:-1]),
         ),
-        len(data.index)
+        len(data.index),
     )
     fig_freq = plot_processed_data(
         data,
@@ -58,7 +63,7 @@ def plot_ecg(filename, samplerate, num):
             np.fft.rfftfreq(len(np.trim_zeros(row[:-1])), d=(1.0 / samplerate)),
             np.abs(np.fft.rfft(np.trim_zeros(row[:-1]))),
         ),
-        len(data.index)
+        len(data.index),
     )
 
     plt.show()
@@ -97,7 +102,6 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
     #     print("Normalized confusion matrix")
     # else:
 
-
     fig, ax = plt.subplots()
     im = ax.imshow(cm, interpolation="nearest", cmap=cmap)
     ax.figure.colorbar(im, ax=ax)
@@ -117,7 +121,7 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
     # Loop over data dimensions and create text annotations.
-    fmt = ".2f" if normalize else "d"
+    fmt = ".3f" if normalize else "d"
     thresh = cm.max() / 2.0
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
@@ -130,4 +134,104 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
                 color="white" if cm[i, j] > thresh else "black",
             )
     fig.tight_layout()
+    plt.show()
+
+
+def plot_pr_curve(probabilities, true_cats, class_list):
+
+    predictions = probabilities
+
+    n_classes = probabilities.shape[1]
+
+    # Compute ROC curve and ROC area for each class
+    precision = dict()
+    recall = dict()
+    pr_auc = dict()
+    for i in range(n_classes):
+        precision[i], recall[i], _ = precision_recall_curve(true_cats[:, i], predictions[:, i])
+        pr_auc[i] = auc(recall[i], precision[i])
+
+    # Plot all ROC curves
+    lw = 2
+    plt.figure()
+
+    colors = cycle(["aqua", "darkorange", "cornflowerblue", "green", "red"])
+    for i, color in zip(range(n_classes), colors):
+        plt.plot(
+            recall[i],
+            precision[i],
+            color=color,
+            lw=lw,
+            label="{0} (area = {1:0.3f})" "".format(class_list[i], pr_auc[i]),
+        )
+
+    plt.plot([0, 1], [0.5, 0.5], "k--", lw=lw)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("Recall")
+    plt.ylabel("Precision")
+    plt.title("Precision-Recall (multi-class)")
+    plt.legend(loc="lower right")
+    plt.show()
+
+
+def plot_roc_curve(probabilities, true_cats, class_list):
+
+    predictions = probabilities
+
+    n_classes = probabilities.shape[1]
+
+    # Compute ROC curve and ROC area for each class
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(true_cats[:, i], predictions[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # Aggregate all false positive rates
+    all_fpr = np.unique(np.concatenate([fpr[i] for i in range(n_classes)]))
+
+    # Interpolate all ROC curves at this points
+    mean_tpr = np.zeros_like(all_fpr)
+    for i in range(n_classes):
+        mean_tpr += interp(all_fpr, fpr[i], tpr[i])
+
+    # Average and compute area under curve
+    mean_tpr /= n_classes
+
+    #     fpr["macro"] = all_fpr
+    #     tpr["macro"] = mean_tpr
+    #     roc_auc["macro"] = auc(fpr["macro"], tpr["macro"])
+
+    # Plot all ROC curves
+    lw = 2
+    plt.figure()
+    #     plt.plot(fpr["micro"], tpr["micro"],
+    #              label='micro-average ROC curve (area = {0:0.2f})'
+    #                    ''.format(roc_auc["micro"]),
+    #              color='deeppink', linestyle=':', linewidth=4)
+
+    #     plt.plot(fpr["macro"], tpr["macro"],
+    #              label='macro-average ROC curve (area = {0:0.2f})'
+    #                    ''.format(roc_auc["macro"]),
+    #              color='navy', linestyle=':', linewidth=4)
+
+    colors = cycle(["aqua", "darkorange", "cornflowerblue", "green", "red"])
+    for i, color in zip(range(n_classes), colors):
+        plt.plot(
+            fpr[i],
+            tpr[i],
+            color=color,
+            lw=lw,
+            label="{0} (area = {1:0.3f})" "".format(class_list[i], roc_auc[i]),
+        )
+
+    plt.plot([0, 1], [0, 1], "k--", lw=lw)
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title("Receiver operating characteristic (multi-class)")
+    plt.legend(loc="lower right")
     plt.show()

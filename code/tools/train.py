@@ -1,3 +1,4 @@
+import os
 import sys
 
 import pandas as pd
@@ -41,6 +42,24 @@ def preprocess(trainfile, testfile, fft=False):
         dataset_arrays = dataset_fft(dataset_arrays)
 
     return dataset_arrays, labels, sparse_labels, datasets
+
+
+def split_test_train(classfiles, dfpath, test_split):
+
+    # Don't do anything if the files have already been made
+    if os.path.exists(dfpath + "_train.csv"):
+        return None
+
+    df = pd.concat((pd.read_csv(f, header=None) for f in classfiles), ignore_index=True)
+    # Shuffle in-place
+    df = df.sample(frac=1)
+
+    # Split into train and test sets
+    df_test = df.sample(frac=test_split)  # Sample without replacement
+    df_train = df  # Whatever's left
+
+    df_train.to_csv(dfpath + "_train.csv", header=False, index=False)
+    df_test.to_csv(dfpath + "_test.csv", header=False, index=False)
 
 
 def class_count(datasets):
@@ -105,7 +124,7 @@ def train(model, dataset_arrays, labels, config):
     model.compile(
         optimizer=config["optimizer"],
         loss=config["loss"],
-        metrics=[tf.keras.metrics.categorical_accuracy],
+        metrics=config.get("metrics", [tf.keras.metrics.categorical_accuracy]),
     )
     history = model.fit(
         dataset_arrays["train"],
