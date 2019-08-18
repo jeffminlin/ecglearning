@@ -1,7 +1,13 @@
 # ecglearning
-Detection of cardiac arrhythmia using deep learning techniques.
+Detection of cardiac arrhythmia using deep learning techniques. This was a group project with the Graduate Data Science Organization at U.C. Berkeley with Jeffmin Lin, Alex Robson, Yao Tang, and Yang Ha under the guidance of Mike Osorio. See the [GDSO website](https://gdso.berkeley.edu/) for more information about the organization, the Data Science workshop, or to see the slides from our presentation.
 
-## Getting started
+## How to play with the data
+### Data
+You can find the data at [Kaggle](https://www.kaggle.com/shayanfazeli/heartbeat).
+
+### Existing model architectures
+You can examine the included notebooks in the `code` folder to see the architectures that we've played with. There is a very basic API which wraps Tensorflow Keras and some plotting utilities for the specific models in this project in the included `tools` package.
+
 ### Conda environment
 If you're running Windows, you can install the dependencies in the `environment-win.yml` file by running
 ```sh
@@ -32,13 +38,19 @@ Feel free to add/update your environment to the repo in a similar file, with
 ```sh
 $ conda env export > environment-[OS].yml
 ```
-where `[OS]` should be `mac`, `ubuntu`, etc.
+where `[OS]` should be `mac`, `ubuntu`, etc. Make sure the saved encoding is `utf-8`.
 
-The [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) has more information about manging environments. If you'd like to add packages to the environment, don't forget to update the `environment-[OS].yml` file with
+To update your local environment with a new .yml file, run
 ```sh
 $ conda env update -f environment-[OS].yml
 ```
-where `[OS]` is your OS.
+where `[OS]` should be `mac`, `ubuntu`, etc.
+
+The [conda documentation](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html) has more information about manging environments. If you'd like to add packages to the environment file, update the `environment-[OS].yml` file with
+```sh
+$ conda env export > environment-[OS].yml
+```
+Make sure the encoding is `utf-8`, and push the result.
 
 ### TensorFlow
 To test that the TensorFlow 2.0 beta is up and running, start the `conda` environment (if you haven't already) and run `python`:
