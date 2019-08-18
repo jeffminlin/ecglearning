@@ -1,9 +1,12 @@
 # ecglearning
-Detection of cardiac arrhythmia using deep learning techniques.
+Detection of cardiac arrhythmia using deep learning techniques. This was a group project with the Graduate Data Science Organization at U.C. Berkeley with Jeffmin Lin, Alex Robson, Yao Tang, and Yang Ha under the guidance of Mike Osorio. See the [GDSO website](https://gdso.berkeley.edu/) for more information about the organization, the Data Science workshop, or to see the slides from our presentation.
 
-## Getting started
+## How to play with the data
 ### Data
 You can find the data at [Kaggle](https://www.kaggle.com/shayanfazeli/heartbeat).
+
+### Existing model architectures
+You can examine the included notebooks in the `code` folder to see the architectures that we've played with. There is a very basic API which wraps Tensorflow Keras and some plotting utilities for the specific models in this project in the included `tools` package.
 
 ### Conda environment
 If you're running Windows, you can install the dependencies in the `environment-win.yml` file by running
