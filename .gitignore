@@ -3,6 +3,9 @@ data/
 logs/
 models/
 
+# presentation materials
+presentation/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

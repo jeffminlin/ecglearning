@@ -81,7 +81,16 @@ def plot_fit_history(history):
     plt.show()
 
 
-def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Blues):
+def plot_cm(
+    y_true,
+    y_pred,
+    classes,
+    normalize=False,
+    title=None,
+    cmap=plt.cm.Blues,
+    savefile=None,
+    norm_fmt=".2f",
+):
     """
     This function from the scikit-learn website prints and plots the confusion matrix.
     Normalization can be applied by setting `normalize=True`.
@@ -121,7 +130,7 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
     plt.setp(ax.get_xticklabels(), rotation=45, ha="right", rotation_mode="anchor")
 
     # Loop over data dimensions and create text annotations.
-    fmt = ".3f" if normalize else "d"
+    fmt = norm_fmt if normalize else "d"
     thresh = cm.max() / 2.0
     for i in range(cm.shape[0]):
         for j in range(cm.shape[1]):
@@ -134,10 +143,14 @@ def plot_cm(y_true, y_pred, classes, normalize=False, title=None, cmap=plt.cm.Bl
                 color="white" if cm[i, j] > thresh else "black",
             )
     fig.tight_layout()
+
+    if savefile:
+        plt.savefig(savefile, bbox_inches="tight")
+
     plt.show()
 
 
-def plot_pr_curve(probabilities, true_cats, class_list):
+def plot_pr_curve(probabilities, true_cats, class_list, savefile=None):
 
     predictions = probabilities
 
@@ -148,7 +161,9 @@ def plot_pr_curve(probabilities, true_cats, class_list):
     recall = dict()
     pr_auc = dict()
     for i in range(n_classes):
-        precision[i], recall[i], _ = precision_recall_curve(true_cats[:, i], predictions[:, i])
+        precision[i], recall[i], thresholds = precision_recall_curve(
+            true_cats[:, i], predictions[:, i]
+        )
         pr_auc[i] = auc(recall[i], precision[i])
 
     # Plot all ROC curves
@@ -172,10 +187,14 @@ def plot_pr_curve(probabilities, true_cats, class_list):
     plt.ylabel("Precision")
     plt.title("Precision-Recall (multi-class)")
     plt.legend(loc="lower right")
+
+    if savefile:
+        plt.savefig(savefile, bbox_inches="tight")
+
     plt.show()
 
 
-def plot_roc_curve(probabilities, true_cats, class_list):
+def plot_roc_curve(probabilities, true_cats, class_list, savefile=None):
 
     predictions = probabilities
 
@@ -234,4 +253,9 @@ def plot_roc_curve(probabilities, true_cats, class_list):
     plt.ylabel("True Positive Rate")
     plt.title("Receiver operating characteristic (multi-class)")
     plt.legend(loc="lower right")
+
+    if savefile:
+        plt.savefig(savefile, bbox_inches="tight")
+
     plt.show()
+

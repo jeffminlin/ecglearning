@@ -124,7 +124,8 @@ def train(model, dataset_arrays, labels, config):
     model.compile(
         optimizer=config["optimizer"],
         loss=config["loss"],
-        metrics=config.get("metrics", [tf.keras.metrics.categorical_accuracy]),
+        metrics=config.get("metrics", ["accuracy"]),
+        weighted_metrics=config.get("weighted_metrics"),
     )
     history = model.fit(
         dataset_arrays["train"],
